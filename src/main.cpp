@@ -12,14 +12,17 @@
 #define TFT_MOSI 34 //not used
 #define TFT_SCLK 35 //not used
 
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK);
 
 #define LEFT_BTN   21 
 #define OK_BTN     22
 #define RIGHT_BTN  23
 
+#define DHT_PIN     2
+
 void drawMenu();
 void executeOption(int option);
+int readDHT11Humidity(int pin);
 
 
 int option = 0; // Track selected option
@@ -81,9 +84,9 @@ void drawMenu() {
   tft.println("MENU:");
   tft.setTextColor(ST77XX_WHITE);
 
-  const int maxOption = 3; 
+  const int maxOption = 2; 
   const char* options[] = {
-    "1. Scan Wi-Fi", "2. Check Temp/Humidity", "3. Option Three", "4. Option Four"};
+    "1. Chat", "2. Check Temp/Humidity", "3. Screen saver"};
 
   for (int i = 0; i <= maxOption; i++) {
     if (i == option) {
@@ -98,17 +101,54 @@ void drawMenu() {
 }
 
 // -----------------------------------------Execute the selected option
-void executeOption(int opt) {
-  if (option == 0)
-  {
-    tft.fillScreen(ST77XX_BLACK);
-    tft.setCursor(10, 10);
-    tft.setTextSize(2);
-    tft.setTextColor(ST77XX_CYAN);
-    tft.println("Scanning Wi-Fi...");
-    Serial.println("Scanning Wi-Fi...");
+// --- define this function outside of executeOption ---
+int readDHT11Humidity(int pin) {
+    uint8_t data[5] = {0};
 
-    scanWiFiNetworks();
-  } 
-  
+    pinMode(pin, OUTPUT); digitalWrite(pin, LOW); delay(18);
+    digitalWrite(pin, HIGH); delayMicroseconds(40); pinMode(pin, INPUT);
+
+    if (!pulseIn(pin, LOW, 100) || !pulseIn(pin, HIGH, 100)) return -1;
+
+    for (int i = 0; i < 40; i++) {
+        pulseIn(pin, LOW, 100);
+        if (pulseIn(pin, HIGH, 100) > 40)
+            data[i / 8] |= (1 << (7 - (i % 8)));
+    }
+
+    // simple checksum validation
+    if (data[4] != (data[0] + data[1] + data[2] + data[3])) return -1;
+
+    return data[0]; // humidity %
 }
+
+// --- your executeOption function ---
+void executeOption(int option) {
+    if (option == 0) {
+        tft.fillScreen(ST77XX_BLACK);
+        tft.setCursor(10, 10);
+        tft.setTextSize(2);
+        tft.setTextColor(ST77XX_CYAN);
+        tft.println("Scanning Wi-Fi...");
+        Serial.println("Scanning Wi-Fi...");
+
+        scanWiFiNetworks();
+    } 
+
+    if (option == 1) {
+        int humidity = readDHT11Humidity(2); // replace 2 with your DHT11 pin
+        if (humidity >= 0) {
+            tft.fillScreen(ST77XX_BLACK);
+            tft.setCursor(10, 10);
+            tft.setTextSize(2);
+            tft.setTextColor(ST77XX_GREEN);
+            tft.print("Humidity: ");
+            tft.print(humidity);
+            tft.println("%");
+            Serial.print("Humidity: "); Serial.println(humidity);
+        } else {
+            Serial.println("DHT11 read failed");
+        }
+    }
+}
+

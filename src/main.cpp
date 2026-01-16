@@ -2,10 +2,10 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7735.h>
 #include "wifi_scan.h"  //Wi-Fi scan functions
-#include <DHTesp.h>
+#include <DHT.h>
 
 // Pins
-#define TFT_CS   14
+#define TFT_CS   25
 #define TFT_DC   26
 #define TFT_RST  27
 

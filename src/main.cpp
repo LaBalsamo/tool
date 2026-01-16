@@ -82,7 +82,6 @@ void drawMenu() {
   tft.setTextSize(1);
   tft.setTextColor(ST77XX_MAGENTA);
   tft.println("MENU:");
-  tft.setTextColor(ST77XX_WHITE);
 
   const int maxOption = 2; 
   const char* options[] = {
@@ -90,9 +89,9 @@ void drawMenu() {
 
   for (int i = 0; i <= maxOption; i++) {
     if (i == option) {
-      tft.setTextColor(ST77XX_YELLOW); // Highlight selected option
+      tft.setTextColor(ST77XX_WHITE); // Highlight selected option
     } else {
-      tft.setTextColor(ST77XX_WHITE);
+      tft.setTextColor(ST77XX_MAGENTA);
     }
     tft.setCursor(20, 40 + i * 30);
     tft.println(options[i]);
@@ -127,8 +126,8 @@ void executeOption(int option) {
     if (option == 0) {
         tft.fillScreen(ST77XX_BLACK);
         tft.setCursor(10, 10);
-        tft.setTextSize(2);
-        tft.setTextColor(ST77XX_CYAN);
+        tft.setTextSize(1);
+        tft.setTextColor(ST77XX_MAGENTA);
         tft.println("Scanning Wi-Fi...");
         Serial.println("Scanning Wi-Fi...");
 
@@ -140,8 +139,8 @@ void executeOption(int option) {
         if (humidity >= 0) {
             tft.fillScreen(ST77XX_BLACK);
             tft.setCursor(10, 10);
-            tft.setTextSize(2);
-            tft.setTextColor(ST77XX_GREEN);
+            tft.setTextSize(1);
+            tft.setTextColor(ST77XX_MAGENTA);
             tft.print("Humidity: ");
             tft.print(humidity);
             tft.println("%");

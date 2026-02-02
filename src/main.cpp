@@ -5,18 +5,16 @@
 #include <DHT.h>
 
 // Pins
+// Pins
 #define TFT_CS   25
-#define TFT_DC   26
-#define TFT_RST  27
+#define TFT_DC   27
+#define TFT_RST  26
 
-#define TFT_MOSI 34 //not used
-#define TFT_SCLK 35 //not used
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK);
-
-#define LEFT_BTN   21 
+#define UP_BTN     21 
 #define OK_BTN     22
-#define RIGHT_BTN  23
+#define DOWN_BTN   17
 
 #define DHT_PIN     2
 
@@ -44,9 +42,9 @@ void setup() {
    Serial.println("Menu System Initialized");
 
   // ----------------------------------------Initialize buttons--------------------------
-  pinMode(LEFT_BTN, INPUT_PULLUP);
+  pinMode(UP_BTN, INPUT_PULLUP);
   pinMode(OK_BTN, INPUT_PULLUP);
-  pinMode(RIGHT_BTN, INPUT_PULLUP);
+  pinMode(DOWN_BTN, INPUT_PULLUP);
 
   //----------------------------------------- Draw initial menu-------------------------
   drawMenu();
@@ -55,13 +53,13 @@ void setup() {
 
 void loop() {
   // ------------------------------------Read buttons (active LOW)------------------------
-  if (digitalRead(LEFT_BTN) == LOW) {
+  if (digitalRead(UP_BTN) == LOW) {
     option--;
     if (option < 0) option = maxOption;
     drawMenu();
     delay(200); // simple debounce
 
-  if (digitalRead(RIGHT_BTN) == LOW) {
+  if (digitalRead(DOWN_BTN) == LOW) {
     option++;
     if (option > maxOption) option = 0;
     drawMenu();
